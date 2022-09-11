@@ -8,8 +8,10 @@ export default function Home() {
   const [allData, setAllData] = useState([]);
   const [allUser, setAllUser] = useState([]);
 
+  // Gives organized Messages
   const structureData = (data, req) => {
     let obj = {};
+    // For Weeks
     if (req == "w") {
       for (let i = 7; i >= 0; i--) {
         const date = moment().subtract(i, "d").format();
@@ -17,7 +19,8 @@ export default function Home() {
         obj[date] = obj[date] || 0;
       }
     }
-
+  
+    //For Months
     if (req == "M") {
       for (let i = 30; i >= 0; i--) {
         const date = moment().subtract(i, "d").format();
@@ -26,6 +29,7 @@ export default function Home() {
       }
     }
 
+    //Destructure Data
     for (let i = 0; i < data.length; i++) {
       let d = data[i].created_at;
       d = moment(d).format("YYYY_MM_DD");
@@ -35,7 +39,9 @@ export default function Home() {
     let res = Object.entries(obj);
     return res;
   };
-
+  
+  // Call For getting messages From Database
+  // Req = "w", "M"
   async function getDates(req) {
     const dateTo = moment().format();
     const dateFrom = moment().subtract(1, req).format();
@@ -48,8 +54,11 @@ export default function Home() {
     setAllData(structureData(myData, req));
   }
 
+  // Structuring Active Users
   const structureUser = (data, req) => {
     let obj = {};
+    
+    //Same code as above but used set to avoid duplication of user on same date
     if (req == "w") {
       for (let i = 7; i > 0; i--) {
         const date = moment().subtract(i, "d").format();
@@ -61,6 +70,7 @@ export default function Home() {
       }
     }
 
+    //Same code as above but used set to avoid duplication of user on same date
     if (req == "M") {
       for (let i = 30; i > 0; i--) {
         const date = moment().subtract(i, "d").format();
@@ -73,7 +83,7 @@ export default function Home() {
     }
 
     console.log(obj);
-
+    //adding dates wise user 
     for (let i = 0; i < data.length; i++) {
       let d = data[i].created_at;
       d = moment(d).format("YYYY_MM_DD");
@@ -82,6 +92,8 @@ export default function Home() {
     }
 
     let res = [];
+    
+    // Destructuring obj ( { date : user1, user 2}
     for (const key in obj) {
       let temp = obj[key].size;
       res.push({ date: key, counts: temp });
@@ -89,6 +101,8 @@ export default function Home() {
     return res;
   };
 
+  // Database call for getting user
+  // req is for either month or week
   async function getActiveUsers(req) {
     const dateTo = moment().format();
     const dateFrom = moment().subtract(1, "M").format();
@@ -125,6 +139,14 @@ export default function Home() {
           </div>
         );
       })}
+      
+      <div>
+        <select onChange={(e) => getActiveUsers(e.target.value)}>
+        <option value='w'>Week</option>
+        <option value='M'>Month</option>
+      </select>
+
+      </div>
     </div>
   );
 }
